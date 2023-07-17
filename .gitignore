@@ -2,10 +2,14 @@
 __pycache__/
 *.py[cod]
 *$py.class
+legal_obligations_by_year.png
+legal_obligations_by_year_and_form.png
+plot.png
+fig1.png
 
 .DS_Store
 *.csv
-*.png
+generated-files/*
 # C extensions
 *.so
 
