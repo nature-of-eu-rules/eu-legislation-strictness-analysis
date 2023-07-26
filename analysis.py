@@ -39,6 +39,10 @@ if args.nozeros:
 
 STRICTNESS_METRIC = str(args.strictm) # Strictness metric
 OUT_DIR = str(args.output) # Output directory
+# Create directory if not exist
+if not os.path.exists(OUT_DIR):
+    # If it doesn't exist, create it
+    os.makedirs(OUT_DIR)
 
 import pandas as pd
 import plotly.express as plotly
@@ -148,9 +152,8 @@ plt.rc('legend', fontsize=MEDIUM_SIZE)    # legend fontsize
 plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 # Now plot the distribution by legal form:
-
 # group the rows by 'year' and 'category', and count the number of occurrences of each category
-counts = metadata_df.groupby([TIME_COLUMN, 'form']).size()
+counts = metadata_df.groupby(['year', 'form']).size()
 # unstack the multi-level index and fill any missing values with 0
 counts = counts.unstack().fillna(0)
 # sort the counts in descending order
@@ -158,10 +161,11 @@ top_counts = counts.sum().sort_values(ascending=False)
 # filter the counts DataFrame to only include the top categories
 counts = counts[top_counts.index]
 # create a stacked bar plot of the counts by year, set the plot title and labels
-fig = plotly.bar(counts, title='{} distribution of EU legislation by legal form'.format(TIME_COLUMN.upper()), labels={
+fig = plotly.bar(counts, title='Yearly distribution of EU legislation by legal form', labels={
                      "value" : "# of documents",
                      "form" : "Legal form"
                  }, color_discrete_sequence=custom_palette)
+
 fig.update_xaxes(tickmode='linear', tickangle=60)
 fig.write_html(os.path.join(OUT_DIR, 'eu_legislation_distribution_over_legal_forms.html'))
 fig.show()
@@ -169,7 +173,7 @@ fig.show()
 # Now we will plot how many documents there are across year and policy area. 
 
 # group the rows by 'year' and 'category', and count the number of occurrences of each category
-counts = metadata_df.groupby([TIME_COLUMN, 'dc_string']).size()
+counts = metadata_df.groupby(['year', 'dc_string']).size()
 # unstack the multi-level index and fill any missing values with 0
 counts = counts.unstack().fillna(0)
 # sort the counts in descending order
@@ -177,7 +181,7 @@ top_counts = counts.sum().sort_values(ascending=False)
 # filter the counts DataFrame to only include the top categories
 counts = counts[top_counts.index]
 # create a stacked bar plot of the counts by year, set the plot title and labels
-fig = plotly.bar(counts, title='{} distribution of EU legislation over major policy areas'.format(TIME_COLUMN.upper()), labels={
+fig = plotly.bar(counts, title='Yearly distribution of EU legislation over major policy areas', labels={
                      "value" : "# of documents",
                      "dc_string" : "Policy Area"
                  }, color_discrete_sequence=custom_palette)
@@ -187,12 +191,12 @@ fig.show()
 
 # Apart from Agriculture (the most prevalent policy area by far) what is the distribution of documents by policy areas and year?
 no_agri_df = metadata_df[~metadata_df['dc_string'].isin(['Agriculture'])]
-counts = no_agri_df.groupby([TIME_COLUMN, 'dc_string']).size()
+counts = no_agri_df.groupby(['year', 'dc_string']).size()
 counts = counts.unstack().fillna(0)
 top_counts = counts.sum().sort_values(ascending=False)
 counts = counts[top_counts.index]
 
-fig = plotly.bar(counts, title='{} distribution of EU legislation over major policy areas <br><sup>(Excludes Agriculture policy area)</sup>'.format(TIME_COLUMN.upper()), labels={
+fig = plotly.bar(counts, title='Yearly distribution of EU legislation over major policy areas <br><sup>(Excludes Agriculture policy area)</sup>', labels={
                      "value" : "# of documents",
                      "dc_string" : "Policy Area"
                  }, color_discrete_sequence=custom_palette)
@@ -201,12 +205,12 @@ fig.write_html(os.path.join(OUT_DIR, 'eu_legislation_distribution_over_policy_ar
 fig.show()
 
 # Let us repeat the two plots above by limiting our focus to only those documents which contain at least one legal obligation for a specific agent:
-counts = nonzero_df.groupby([TIME_COLUMN, 'dc_string']).size()
+counts = nonzero_df.groupby(['year', 'dc_string']).size()
 counts = counts.unstack().fillna(0)
 top_counts = counts.sum().sort_values(ascending=False)
 counts = counts[top_counts.index]
 
-fig = plotly.bar(counts, title='{} distribution of EU legislation over major policy areas <br><sup>(Excludes documents that do not contain at least one legal obligation)</sup>'.format(TIME_COLUMN.upper()), labels={
+fig = plotly.bar(counts, title='Yearly distribution of EU legislation over major policy areas <br><sup>(Excludes documents that do not contain at least one legal obligation)</sup>', labels={
                      "value" : "# of documents",
                      "dc_string" : "Policy Area"
                  }, color_discrete_sequence=custom_palette)
@@ -216,12 +220,12 @@ fig.show()
 
 # And similarly removing Agriculture from consideration:
 no_agri_nonzero_df = nonzero_df[~nonzero_df['dc_string'].isin(['Agriculture'])]
-counts = no_agri_nonzero_df.groupby([TIME_COLUMN, 'dc_string']).size()
+counts = no_agri_nonzero_df.groupby(['year', 'dc_string']).size()
 counts = counts.unstack().fillna(0)
 top_counts = counts.sum().sort_values(ascending=False)
 counts = counts[top_counts.index]
 
-fig = plotly.bar(counts, title='{} distribution of EU legislation over major policy areas <br><sup>(Excludes Agriculture policy area and documents which do not contain any legal obligations)</sup>'.format(TIME_COLUMN.upper()), labels={
+fig = plotly.bar(counts, title='Yearly distribution of EU legislation over major policy areas <br><sup>(Excludes Agriculture policy area and documents which do not contain any legal obligations)</sup>', labels={
                      "value" : "# of documents",
                      "dc_string" : "Policy Area"
                  }, color_discrete_sequence=custom_palette)
@@ -264,12 +268,7 @@ max_time = avg_reg_count_by_year_noform[avg_reg_count_by_year_noform[metric_col]
 print("The {} with the maximum {} regulatory statements is: ".format(TIME_COLUMN, STRICTNESS_METRIC),  max_time[TIME_COLUMN].tolist())
 
 # Generic function to plot line graphs:
-def plot_line_graph(df, xcol, ycol, labels, w, h, title, filepath, color='', color_discrete_sequence=''):
-    if ycol == 'avg_reg_count':
-        title = "Mean " + title
-    else:
-        title = "Total " + title
-        
+def plot_line_graph(df, xcol, ycol, labels, w, h, title, filepath, color='', color_discrete_sequence=''):    
     if color == '':
         if color_discrete_sequence == '':
             myFigure = plotly.line(df, x=xcol, y=ycol, labels=labels, title=title)
@@ -459,34 +458,5 @@ s.set_ylabel('Policy Area', fontsize=25)
 s.set_xlabel('Legal Form', fontsize=25)
 fig = s.get_figure()
 fig.savefig(os.path.join(OUT_DIR, "legal_obligations_heatmap_by_policyarea_and_form.svg"), format="svg")
-
-# # ## 6. Strictness analysis by date / year
-# # Now we analyse which are the top n strictest dates / years across the 50 years of EU legislation. I.e., we calculate on which dates / in which years the most number of regulatory statements have been published.
-
-# data_analysis = None
-# if STRICTNESS_METRIC == 'count':
-#     date_analysis = metadata_df.groupby(['date', 'dc_string'])['reg_count'].sum()
-#     no_ind_date = date_analysis.reset_index(drop=False)
-# else:
-#     date_analysis = metadata_df.groupby(['date', 'dc_string'])['reg_count'].mean(numeric_only=True)
-#     no_ind_date = date_analysis.reset_index(drop=False)
-        
-# date_analysis_df = pd.DataFrame(no_ind_date.values.tolist(), columns=['date', 'dc_string', metric_col])
-# date_analysis_df
-
-
-# These are the Top N days on which the most number of regulatory statements (legal obligations) have been specified in a particular policy area:
-
-# # In[322]:
-
-
-# n = 20
-# sorted_df = date_analysis_df.sort_values('total_reg_count', ascending=False).head(n)
-# sorted_df
-
-
-# # In[ ]:
-
-
 
 
