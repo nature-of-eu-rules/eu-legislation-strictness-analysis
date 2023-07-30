@@ -101,4 +101,4 @@ for index, row in metadata_df.iterrows():
 metadata_df['date'] = canon_adoption_dates
 
 # Save enriched metadata to CSV file
-metadata_df.to_csv(os.path(OUT_FNAME), index=False)
+metadata_df.to_csv(OUT_FNAME, index=False)
