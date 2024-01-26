@@ -50,7 +50,12 @@ import plotly.express as plotly
 # Import data
 metadata_df = pd.read_csv(IN_FNAME)
 metadata_df['word_count'] = metadata_df['word_count'].replace(1,0)
-metadata_df['date'] = pd.to_datetime(metadata_df['date'])
+metadata_df['date_adoption'] = pd.to_datetime(metadata_df['date_adoption'])
+# Generate a new 'Year' column
+metadata_df['year'] = metadata_df['date_adoption'].dt.year
+# Get one topic (to make analysis easier)
+metadata_df['dc_string'] = metadata_df['directory_code'].str.split('|').str[0]
+
 print('Total number of documents: ', len(metadata_df))
 
 #################################
