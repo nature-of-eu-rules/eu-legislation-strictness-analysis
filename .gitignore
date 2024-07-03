@@ -9,7 +9,6 @@ plot.png
 fig1.png
 
 .DS_Store
-*.csv
 generated-files/*
 # C extensions
 *.so
