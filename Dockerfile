@@ -71,12 +71,18 @@ COPY data/ /app/data-preprocessing/data
 COPY requirements-full.txt .
 # Install required libraries
 RUN pip install -r requirements-full.txt
-# Start nginx server (to have a process that continuously runs so that we can shell into the container if needed)
-CMD ["/start.sh"]
+# Count the number of files in the directory and print to console
+# Start a shell for debugging
+RUN /bin/bash
 # Run sentence extraction script
-RUN python extract_sentences.py -in data/ -out sentences.csv
-# Copy output of Step 1 of the pipeline to root of container (app directory)
-COPY sentences.csv /app
+# If successful, copy output of Step 1 of the pipeline to root of container (app directory)
+RUN python extract_sentences.py -in data/ -out sentences.csv && \
+    if [ -f sentences.csv ]; then \
+        echo "Sentences extracted successfully" && \
+        cp sentences.csv /app; \
+    else \
+        echo "Problem with sentence extraction" && exit 1; \
+    fi
 
 ###############################################################
 # STEP 2: Classification of regulatory statements
@@ -89,7 +95,12 @@ RUN git clone http://github.com/nature-of-eu-rules/regulatory-statement-classifi
 # Set working directory to root of cloned repo
 WORKDIR /app/regulatory-statement-classification
 # Run sentence classification script
-RUN python rule-based-classification.py -in ../data-preprocessing/sentences.csv -out classified-sentences.csv -agts data/agent_nouns.json
+RUN python rule-based-classification.py -in ../data-preprocessing/sentences.csv -out classified-sentences.csv -agts data/agent_nouns.json && \
+    if [ -f classified-sentences.csv ]; then \
+        echo "Successfully classified sentences"; \
+    else \
+        echo "Problem classifying sentences" && exit 1; \
+    fi
 
 #########################################################################################
 # STEP 3: Analyse the classified sentences 
@@ -107,7 +118,12 @@ WORKDIR /app/eu-legislation-strictness-analysis
 # Copy EU legislation document metadata here, it is needed for the analysis
 COPY metadata.csv .
 # Run metadata enrichment script (enriches metadata file with number of regulatory statements in each document amongst other things)
-RUN python prepare-data-for-analysis.py -m metadata.csv -c ../regulatory-statement-classification/classified-sentences.csv -o enriched-metadata.csv
+RUN python prepare-data-for-analysis.py -m metadata.csv -c ../regulatory-statement-classification/classified-sentences.csv -o enriched-metadata.csv && \
+    if [ -f enriched-metadata.csv ]; then \
+        echo "Successfully calculated number of regulatory sentences for each document"; \
+    else \
+        echo echo "Problem calculating number of regulatory sentences for each document" \ && exit 1; \
+    fi
 
 # 3b: Do the analysis
 # Generate images and interactive plots for analysis of regulatory statement frequency

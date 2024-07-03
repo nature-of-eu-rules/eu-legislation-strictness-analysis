@@ -1,4 +1,9 @@
+# data files
+*.csv
+*.zip
+
 # Byte-compiled / optimized / DLL files
+app/
 data/
 __pycache__/
 *.py[cod]
