@@ -90,12 +90,12 @@ metadata_df['word_count'] = word_counts
 # (in some cases there are multiple adoption dates for the same document)
 canon_adoption_dates = []
 for index, row in metadata_df.iterrows():
-    if len(row['date_adoption'].split('|')) > 1:
-        cdate = row['date_adoption'].split('|')[0]
+    if len(str(row['date_adoption']).split('|')) > 1:
+        cdate = str(row['date_adoption']).split('|')[0]
         curr_date = pd.to_datetime(cdate.strip(), format='%Y-%m-%d')
         canon_adoption_dates.append(curr_date)
     else:
-        curr_date = pd.to_datetime(row['date_adoption'], format='%Y-%m-%d')
+        curr_date = pd.to_datetime(str(row['date_adoption']), format='%Y-%m-%d')
         canon_adoption_dates.append(curr_date)
 
 metadata_df['date'] = canon_adoption_dates
