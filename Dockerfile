@@ -84,6 +84,8 @@ RUN python extract_sentences.py -in data/ -out sentences.csv && \
         echo "Problem with sentence extraction" && exit 1; \
     fi
 
+RUN pip freeze >> libs.txt
+
 ###############################################################
 # STEP 2: Classification of regulatory statements
 # Description: classifies sentences as either regulatory or not

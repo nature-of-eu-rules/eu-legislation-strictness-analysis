@@ -5,6 +5,7 @@ pandas==2.2.2
 plotly==5.23.0
 matplotlib==3.9.1
 scipy==1.13.1
+numpy==1.26.4
 scikit-learn==1.5.1
 seaborn==0.13.2
 nltk==3.8.1
@@ -14,3 +15,20 @@ python-Levenshtein==0.25.1
 spacy==3.5.4
 transformers==4.30.2
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.5.0/en_core_web_sm-3.5.0.tar.gz
+
+# beautifulsoup4==4.12.3
+# lxml==5.2.2
+# kaleido==0.2.1
+# pandas==2.2.2
+# plotly==5.23.0
+# matplotlib==3.9.1
+# scipy==1.13.1
+# scikit-learn==1.5.1
+# seaborn==0.13.2
+# nltk==3.8.1
+# pymupdf==1.24.8
+# thefuzz==0.22.1
+# python-Levenshtein==0.25.1
+# spacy==3.5.4
+# transformers==4.30.2
+# https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.5.0/en_core_web_sm-3.5.0.tar.gz
