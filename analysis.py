@@ -72,10 +72,14 @@ from sklearn import datasets
 print()
 print('Global correlation:')
 print()
-corr1, p_value1 = scipy.stats.spearmanr(metadata_df['reg_count'], metadata_df['word_count'])
-print('Spearman correlation (reg_count | word_count):', corr1, ' - ', p_value1)
-corr2, p_value2 = scipy.stats.pearsonr(metadata_df['reg_count'], metadata_df['word_count'])
-print('Pearson correlation (reg_count | word_count):', corr2, ' - ', p_value2)
+reg_has_variance = metadata_df['reg_count'].nunique() > 1
+word_has_variance = metadata_df['word_count'].nunique() > 1
+
+if reg_has_variance and word_has_variance:
+    corr1, p_value1 = scipy.stats.spearmanr(metadata_df['reg_count'], metadata_df['word_count'])
+    print('Spearman correlation (reg_count | word_count):', corr1, ' - ', p_value1)
+    corr2, p_value2 = scipy.stats.pearsonr(metadata_df['reg_count'], metadata_df['word_count'])
+    print('Pearson correlation (reg_count | word_count):', corr2, ' - ', p_value2)
 
 word_count_test = metadata_df.groupby([TIME_COLUMN, 'dc_string'])['word_count'].sum()
 word_count_test_ind = word_count_test.reset_index(drop=False)
