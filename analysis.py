@@ -55,6 +55,10 @@ if 'year' not in metadata_df.columns:
     # Generate a new 'Year' column
     metadata_df['year'] = metadata_df['date_adoption'].dt.year
 
+# Fill missing values with an empty string
+metadata_df['directory_code'] = metadata_df['directory_code'].fillna('')
+# Convert the 'directory_code' column to string type
+metadata_df['directory_code'] = metadata_df['directory_code'].astype(str)
 if 'dc_string' not in metadata_df.columns:
     # Get one topic (to make analysis easier)
     metadata_df['dc_string'] = metadata_df['directory_code'].str.split('|').str[0]
@@ -96,7 +100,11 @@ policy_area_new_frame['word_count'] = word_count_new_frame['word_count'].tolist(
 print()
 print('Correlation relative to policy area and {}:'.format(TIME_COLUMN))
 print()
-if reg_has_variance and word_has_variance:
+
+reg_has_variance_p = policy_area_new_frame['reg_count'].nunique() > 1
+word_has_variance_p = policy_area_new_frame['word_count'].nunique() > 1
+
+if reg_has_variance_p and word_has_variance_p:
     corr_pearson1, p_valuea = scipy.stats.pearsonr(policy_area_new_frame['reg_count'], policy_area_new_frame['word_count'])
     corr_spearman1, p_valueb = scipy.stats.spearmanr(policy_area_new_frame['reg_count'], policy_area_new_frame['word_count'])
     print('Pearson correlation (reg_count | word_count):', corr_pearson1, ' - ', format(p_valuea, 'f'))
